@@ -6,6 +6,7 @@ export default class Player {
     movingLeft;
     movingRight;
     lives;
+    points;
 
   constructor(
     context: CanvasRenderingContext2D,
@@ -19,6 +20,7 @@ export default class Player {
     this.sprite = new Image()
     this.sprite.src = "./sprites/alien.png"
     this.lives = 4;
+    this.points = 0;
   }
 
   move() {

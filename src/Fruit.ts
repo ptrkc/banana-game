@@ -7,6 +7,7 @@ export default class Fruit {
     sprite;
     speed;
     points;
+    name;
 
   constructor(
     context: CanvasRenderingContext2D, id: number
@@ -18,6 +19,7 @@ export default class Fruit {
     this.sprite = new Image()
     this.sprite.src = `./sprites/${fruits[id].name}.png`
     this.points = fruits[id].points
+    this.name = fruits[id].name
   }
 
   fall() {
