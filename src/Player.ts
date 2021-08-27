@@ -5,6 +5,7 @@ export default class Player {
     sprite;
     movingLeft;
     movingRight;
+    lives;
 
   constructor(
     context: CanvasRenderingContext2D,
@@ -17,6 +18,7 @@ export default class Player {
     this.movingRight = false;
     this.sprite = new Image()
     this.sprite.src = "./sprites/alien.png"
+    this.lives = 4;
   }
 
   move() {

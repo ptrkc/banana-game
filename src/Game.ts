@@ -37,6 +37,7 @@ export default class Game {
   }
 
   gameLoop() {
+    if(this.player.lives === 0) this.gameOver();
     this.updateState();
     this.renderGame();
   }
@@ -63,12 +64,17 @@ export default class Game {
 
   updateState() {
     const newDrawables: Drawable[] = []
+
     this.drawables.forEach((drawable) => {
       drawable.updateState(this);
       if(drawable.y < 500){
         newDrawables.push(drawable)
+      } else {
+        this.player.lives -= 1;
+        console.log(this.player.lives)
       }
     });
+
     this.drawables = newDrawables
   }
 
@@ -79,5 +85,10 @@ export default class Game {
 
   clearScreen() {
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+  }
+
+  gameOver(){
+    clearInterval(this.gameIntervalId);
+    clearInterval(this.spawnIntervalId);
   }
 }
