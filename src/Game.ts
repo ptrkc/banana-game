@@ -1,4 +1,5 @@
 import Player from "./Player";
+import Fruit from "./Fruit";
 import Drawable from "./Drawable";
 
 export default class Game {
@@ -41,7 +42,16 @@ export default class Game {
   }
 
   spawnLoop(){
-    console.log("chance to spawn fruits or bombs")
+    let id;
+    const random = Math.random()
+    if(random <= .3) id = 0
+    if(random >= .3) id = 1
+    if(random >= .6) id = 2
+    if(random >= .8) id = 3
+    if(random >= .95) id = 4
+    if(Math.random() > .5){
+      this.drawables.push(new Fruit(this.context, id))
+    }
   }
 
   handleKey(e: KeyboardEvent){
@@ -51,9 +61,15 @@ export default class Game {
     this.player.handleTouch(e);
   }
 
-
   updateState() {
-    this.drawables.forEach((drawable) => drawable.updateState(this));
+    const newDrawables: Drawable[] = []
+    this.drawables.forEach((drawable) => {
+      drawable.updateState(this);
+      if(drawable.y < 500){
+        newDrawables.push(drawable)
+      }
+    });
+    this.drawables = newDrawables
   }
 
   renderGame() {
