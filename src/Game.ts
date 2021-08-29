@@ -9,6 +9,7 @@ export default class Game {
   spawnIntervalId: number;
   player: Player;
   drawables: Drawable[];
+  fruitLoopCounter: number;
 
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
@@ -17,6 +18,7 @@ export default class Game {
     this.context = this.canvas.getContext('2d');
     this.player = new Player(this.context, canvas.width / 2 - 30);
     this.drawables = [];
+    this.fruitLoopCounter = 0;
   }
 
   start() {
@@ -30,7 +32,7 @@ export default class Game {
   startIntervals() {
     const { setInterval } = window;
     this.gameIntervalId = setInterval(() => this.gameLoop(), 1000 / 60);
-    this.spawnIntervalId = setInterval(() => this.spawnLoop(), 1000);
+    this.spawnIntervalId = setInterval(() => this.spawnLoop(), 500);
   }
 
   gameLoop() {
@@ -40,6 +42,7 @@ export default class Game {
   }
 
   spawnLoop() {
+    this.fruitLoopCounter++;
     let id;
     const random = Math.random();
     if (random <= 0.3) id = 0;
@@ -48,7 +51,9 @@ export default class Game {
     if (random >= 0.8) id = 3;
     if (random >= 0.95) id = 4;
     if (Math.random() > 0.5) {
-      this.drawables.push(new Fruit(this.context, id));
+      this.drawables.push(
+        new Fruit(this.context, id, Math.floor(this.fruitLoopCounter / 2))
+      );
     }
   }
 
@@ -60,24 +65,24 @@ export default class Game {
   }
 
   updateState() {
-    this.player.updateState()
+    this.player.updateState();
 
     const newDrawables: Drawable[] = [];
 
     this.drawables.forEach((drawable) => {
       drawable.updateState(this);
-      if(this.checkCollision(drawable)){
-        if(drawable.name === "banana"){
-          this.player.points *= 2
-        }else{
-          this.player.points += drawable.points
+      if (this.checkCollision(drawable)) {
+        if (drawable.name === 'banana') {
+          this.player.points *= 2;
+        } else {
+          this.player.points += drawable.points;
         }
-        console.log(this.player.points)
-
+        console.log(this.player.points);
       } else {
         if (drawable.y < 500) {
           newDrawables.push(drawable);
         } else {
+          console.log('lives:' + this.player.lives);
           this.player.lives -= 1;
         }
       }
@@ -86,18 +91,17 @@ export default class Game {
     this.drawables = newDrawables;
   }
 
-  checkCollision(drawable: Drawable){
-    const xAligned = drawable.x > this.player.x - 45 && drawable.x < this.player.x + 45;
+  checkCollision(drawable: Drawable) {
+    const xAligned =
+      drawable.x > this.player.x - 45 && drawable.x < this.player.x + 45;
     const yAligned = drawable.y > this.player.y - 50;
-    if( xAligned && yAligned){
-      return true
-    }
-    return false
+    if (xAligned && yAligned) return true;
+    return false;
   }
 
   renderGame() {
     this.clearScreen();
-    this.player.draw()
+    this.player.draw();
     this.drawables.forEach((drawable) => drawable.draw());
   }
 
