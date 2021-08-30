@@ -2,6 +2,7 @@ import Player from './Player';
 import Fruit from './Fruit';
 import Bomb from './Bomb';
 import FallingObject from './FallingObject';
+import Board from './Board';
 
 export default class Game {
   canvas: HTMLCanvasElement;
@@ -11,6 +12,7 @@ export default class Game {
   spawnBombIntervalId: number;
   increaseDifficultyIntervalId: number;
   player: Player;
+  board: Board;
   fallingObjects: FallingObject[];
   difficulty: number;
 
@@ -20,6 +22,7 @@ export default class Game {
     this.canvas.width = 320;
     this.context = this.canvas.getContext('2d');
     this.player = new Player(this.context, canvas.width / 2 - 30);
+    this.board = new Board(this.context, canvas, this.player);
     this.fallingObjects = [];
     this.difficulty = 0;
   }
@@ -109,6 +112,7 @@ export default class Game {
     this.clearScreen();
     this.player.draw();
     this.fallingObjects.forEach((fallingObject) => fallingObject.draw());
+    this.board.draw();
   }
 
   clearScreen() {

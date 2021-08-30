@@ -38,7 +38,7 @@ export default class FallingObject {
   }
 
   updateState() {
-    if (this.y > 500) this.hitTheFloor = true;
+    if (this.y > 480) this.hitTheFloor = true;
     this.fall();
   }
 
