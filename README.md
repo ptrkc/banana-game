@@ -4,6 +4,9 @@ Collect fruits, avoid bombs! You can play with the arrow keys or a touch screen.
 
 - [Click to play!](https://ptrkc.github.io/banana-game/public/index.html)
 
+https://user-images.githubusercontent.com/40273827/131371337-eed01f4a-2a18-4bc5-aa36-9408b3d132f9.mp4
+
+
 ## Languages and Tools
 
 ![](https://shields.io/badge/-HTML5-E34F26?logo=html5&logoColor=white&style=for-the-badge)
