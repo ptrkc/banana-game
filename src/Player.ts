@@ -1,3 +1,6 @@
+import FallingObject from './FallingObject';
+import Game from './Game';
+
 export default class Player {
   context;
   x;
@@ -42,6 +45,24 @@ export default class Player {
     } else if (e.type === 'touchend') {
       this.movingRight = false;
       this.movingLeft = false;
+    }
+  }
+
+  checkCollision(fallingObject: FallingObject) {
+    const xAligned =
+      fallingObject.x > this.x - 45 && fallingObject.x < this.x + 45;
+    const yAligned = fallingObject.y > this.y - 50;
+    return xAligned && yAligned ? true : false;
+  }
+
+  handleCollision(fallingObject: FallingObject, game: Game) {
+    if (fallingObject.name === 'bomb') {
+      return game.gameOver();
+    }
+    if (fallingObject.name === 'banana') {
+      this.points *= 2;
+    } else {
+      this.points += fallingObject.points;
     }
   }
 
