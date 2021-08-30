@@ -55,10 +55,7 @@ export default class Player {
     return xAligned && yAligned ? true : false;
   }
 
-  handleCollision(fallingObject: FallingObject, game: Game) {
-    if (fallingObject.name === 'bomb') {
-      return game.gameOver();
-    }
+  handleFruitCollision(fallingObject: FallingObject) {
     if (fallingObject.name === 'banana') {
       this.points *= 2;
     } else {
@@ -66,8 +63,9 @@ export default class Player {
     }
   }
 
-  updateState() {
+  updateState(game: Game) {
     if (this.movingLeft || this.movingRight) this.move();
+    if (this.lives <= 0) game.isOver = true;
   }
 
   draw() {

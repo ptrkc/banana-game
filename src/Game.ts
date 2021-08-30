@@ -1,7 +1,6 @@
 import Player from './Player';
 import Fruit from './Fruit';
 import Bomb from './Bomb';
-import FallingObject from './FallingObject';
 import Board from './Board';
 
 export default class Game {
@@ -13,8 +12,10 @@ export default class Game {
   increaseDifficultyIntervalId: number;
   player: Player;
   board: Board;
-  fallingObjects: FallingObject[];
+  fruits: Fruit[];
+  bombs: Bomb[];
   difficulty: number;
+  isOver: boolean;
 
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
@@ -23,8 +24,10 @@ export default class Game {
     this.context = this.canvas.getContext('2d');
     this.player = new Player(this.context, canvas.width / 2 - 30);
     this.board = new Board(this.context, canvas, this.player);
-    this.fallingObjects = [];
+    this.fruits = [];
+    this.bombs = [];
     this.difficulty = 0;
+    this.isOver = false;
   }
 
   start() {
@@ -32,6 +35,16 @@ export default class Game {
     window.addEventListener('keyup', (e) => this.handleKey(e));
     window.addEventListener('touchstart', (e) => this.handleTouch(e));
     window.addEventListener('touchend', (e) => this.handleTouch(e));
+    this.startIntervals();
+  }
+
+  restart() {
+    this.isOver = false;
+    this.fruits = [];
+    this.bombs = [];
+    this.difficulty = 0;
+    this.player = new Player(this.context, this.canvas.width / 2 - 30);
+    this.board = new Board(this.context, this.canvas, this.player);
     this.startIntervals();
   }
 
@@ -43,13 +56,13 @@ export default class Game {
       1000
     );
     this.spawnFruitIntervalId = setInterval(() => this.spawnFruitLoop(), 500);
-    this.spawnBombIntervalId = setInterval(() => this.spawnBombLoop(), 1500);
+    this.spawnBombIntervalId = setInterval(() => this.spawnBombLoop(), 1400);
   }
 
   gameLoop() {
-    if (this.player.lives <= 0) this.gameOver();
     this.updateState();
     this.renderGame();
+    if (this.isOver) this.gameOver();
   }
 
   increaseDifficultyLoop() {
@@ -58,7 +71,7 @@ export default class Game {
 
   spawnFruitLoop() {
     if (Math.random() > 0.5) {
-      this.fallingObjects.push(
+      this.fruits.push(
         new Fruit(this.context, this.difficulty, this.randomFruitId())
       );
     }
@@ -75,7 +88,7 @@ export default class Game {
 
   spawnBombLoop() {
     if (Math.random() > 0.5) {
-      this.fallingObjects.push(new Bomb(this.context, this.difficulty));
+      this.bombs.push(new Bomb(this.context, this.difficulty));
     }
   }
 
@@ -87,31 +100,49 @@ export default class Game {
   }
 
   updateState() {
-    this.player.updateState();
-    this.updateFallingObjects();
+    this.player.updateState(this);
+    this.updateFruits();
+    this.updateBombs();
   }
 
-  updateFallingObjects() {
-    const updatedFalingObjects: FallingObject[] = [];
-    for (const fallingObject of this.fallingObjects) {
-      if (this.player.checkCollision(fallingObject)) {
-        this.player.handleCollision(fallingObject, this);
+  updateFruits() {
+    const updatedFruits: Fruit[] = [];
+
+    for (const fruit of this.fruits) {
+      if (this.player.checkCollision(fruit)) {
+        this.player.handleFruitCollision(fruit);
       } else {
-        if (fallingObject.hitTheFloor) {
-          if (fallingObject.name !== 'bomb') this.player.lives -= 1;
+        if (fruit.hitTheFloor) {
+          this.player.lives -= 1;
         } else {
-          updatedFalingObjects.push(fallingObject);
+          updatedFruits.push(fruit);
         }
       }
-      fallingObject.updateState();
+      fruit.updateState();
     }
-    this.fallingObjects = updatedFalingObjects;
+    this.fruits = updatedFruits;
+  }
+
+  updateBombs() {
+    const updatedBombs: Bomb[] = [];
+    for (const bomb of this.bombs) {
+      if (this.player.checkCollision(bomb)) {
+        this.isOver = true;
+      } else {
+        if (!bomb.hitTheFloor) {
+          updatedBombs.push(bomb);
+        }
+      }
+      bomb.updateState();
+    }
+    this.bombs = updatedBombs;
   }
 
   renderGame() {
     this.clearScreen();
     this.player.draw();
-    this.fallingObjects.forEach((fallingObject) => fallingObject.draw());
+    this.fruits.forEach((fruit) => fruit.draw());
+    this.bombs.forEach((bomb) => bomb.draw());
     this.board.draw();
   }
 
@@ -120,9 +151,24 @@ export default class Game {
   }
 
   gameOver() {
+    this.drawGameOver();
     clearInterval(this.gameIntervalId);
     clearInterval(this.increaseDifficultyIntervalId);
     clearInterval(this.spawnFruitIntervalId);
     clearInterval(this.spawnBombIntervalId);
+    setTimeout(() => {
+      this.restart();
+    }, 3000);
+  }
+
+  drawGameOver() {
+    this.context.font = '30px Arial';
+    this.context.fillStyle = '#FFFFFF';
+    this.context.textAlign = 'center';
+    this.context.fillText(
+      `Game over`,
+      this.canvas.width / 2,
+      this.canvas.height / 2
+    );
   }
 }
